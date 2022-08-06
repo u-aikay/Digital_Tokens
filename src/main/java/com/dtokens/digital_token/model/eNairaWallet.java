@@ -21,7 +21,6 @@ public class eNairaWallet {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime modifyAt;
-    private String accountId;
     private Double balance = 0.00;
     @OneToOne
     private User user;

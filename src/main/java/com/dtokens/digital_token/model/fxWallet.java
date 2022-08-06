@@ -20,7 +20,6 @@ public class fxWallet {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime modifyAt;
-    private String accountId;
     private Boolean balance;
     @OneToOne
     private User user;

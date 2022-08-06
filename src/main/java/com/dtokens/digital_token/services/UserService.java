@@ -2,7 +2,6 @@ package com.dtokens.digital_token.services;
 
 import com.dtokens.digital_token.dtos.UserDto;
 import com.dtokens.digital_token.utils.BaseResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 public interface UserService {
