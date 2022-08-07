@@ -12,6 +12,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
 public interface UserService {
-    BaseResponse<UserResponse> createUserAccount(UserDto userDto, HttpServletRequest request) throws IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException;
+    BaseResponse<UserResponse> createUserAccount(UserDto userDto, HttpServletRequest request)
+            throws IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException;
+
 
 }

@@ -46,22 +46,6 @@ public class LoginServiceImpl implements LoginService {
 
         log.info("Successfully logged in {}!", loginRequest.getEmail());
         return new BaseResponse<>(HttpStatus.OK, message, new JwtAuthResponse(token));
-
-//        try{
-//            log.info("Initiating authentication for " + loginRequest.getEmail());
-//            Authentication auth =  new UsernamePasswordAuthenticationToken(
-//                    loginRequest.getEmail(),loginRequest.getPassword());
-//
-//            authentication = authenticationManager.authenticate(auth);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            token = jwtTokenProvider.generateToken(authentication);
-//            httpServletResponse.setHeader("Authorization", token);
-//        }
-//        catch (BadCredentialsException ex){
-//            throw new Exception("incorrect user credentials", ex);
-//        }
-//        log.info("Successfully logged in {}!", loginRequest.getEmail());
-//        return new BaseResponse<>(HttpStatus.OK, message, new JwtAuthResponse(token));
     }
 
 
