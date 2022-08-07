@@ -2,9 +2,12 @@ package com.dtokens.digital_token.config.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import javax.servlet.FilterChain;
@@ -24,51 +28,57 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Configuration
-@RequiredArgsConstructor
+
+@NoArgsConstructor
+@AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    // inject required dependencies
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+//    @Autowired
+//    private BlacklistService blackListService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        // get jwtToken from http Request
         String token = getJwtFromRequest(request);
-        if (token == null) {
-            filterChain.doFilter(request, response);
-            return;
+//        if (blackListService.tokenExist(token)){
+//            throw new BadCredentialsException("Token blacklisted!");
+//        }
+        // validate token
+        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+            // get username from token
+            String username = jwtTokenProvider.getUsernameFromJwt(token);
+            // load user associated with the token
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities()
+            );
+
+
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            // set spring security
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
-
-
-        Jws<Claims> claimsJws = jwtTokenProvider.validateToken(token);
-        Claims claims = claimsJws.getBody();
-        String email = claims.getSubject();
-        Set<GrantedAuthority> grantedAuthorities = getGrantedAuthoritiesFromClaims(claims);
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                email,
-                null,
-                grantedAuthorities
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
+
     }
 
-    private  String getJwtFromRequest(HttpServletRequest request){
+    private String getJwtFromRequest(HttpServletRequest request) {
         var bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
-    }
 
-    private Set<GrantedAuthority>  getGrantedAuthoritiesFromClaims(Claims claim){
-        List<Map<String, String>> authorities = (List<Map<String, String>>) claim.get("Authorities");
-        return authorities.stream()
-                .map(authority ->
-                        new SimpleGrantedAuthority(authority.get("authority"))).collect(Collectors.toSet());
     }
 }

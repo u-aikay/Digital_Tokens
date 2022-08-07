@@ -3,6 +3,8 @@ package com.dtokens.digital_token.request;
 
 import lombok.*;
 
+import javax.persistence.Column;
+
 @Builder
 @Getter
 @Setter
@@ -11,19 +13,26 @@ import lombok.*;
 public class eNairaRequest {
 
         private String channel_code;
-        private String customer_tier;
-        private String reference;
-        private String account_no;
+        @Column(name = "uid")
         private String bvn;
+        private String uidType;
+        private String reference;
+        private String title;
+        private String firstName;
+        private String middleName;
+        private String lastName;
+        private String userName;
+        private String phone;
+        private String emailId;
+        private String postalCode;
+        private String city;
+        private String address;
+        private String countryOfResidence;
+        private String tier;
+        private String accountNumber;
+        private String dateOfBirth;
+        private String countryOfBirth;
         private String password;
-        private String nin;
-
+        private String remarks;
+        private String referralCode;
 }
-
-
-//NEXTGEN
-//2
-//NXG34567898FGHJJB1
-//0689658501
-//22152793496
-//Password10$$

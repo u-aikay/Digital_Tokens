@@ -26,13 +26,21 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime modifyAt;
     @NotNull
-    private String fullName;
+    private String firstName;
+    @NotNull
+    private String lastName;
+    private String userName;
     @NotNull
     private String email;
     @NotNull
     private String phoneNumber;
     @NotNull
     private String password;
+    @NotNull
+    private String bvn;
+    private String nin;
+    private String eNairaAccountNumber;
+    private Double eNairaAccountBalance;
 
     @Enumerated(EnumType.STRING)
     private Role role;

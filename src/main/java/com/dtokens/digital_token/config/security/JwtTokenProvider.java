@@ -6,50 +6,68 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import java.util.Date;
+import java.util.function.Function;
 
 @Component
 public class JwtTokenProvider {
-    @Value("${app.jwt-secret}")
-    private String jwtSecret;
-
-    @Value("${app.jwt-expiration-minutes}")
-    private int JwtExpirationInMn;
+    //    @Value("${jwt.secret.key}")
+    private final String jwtSecret = "secretKey123";
 
     public String generateToken(Authentication authentication){
-        String email = authentication.getName();
+        String username = authentication.getName();
         Date currentDate = new Date();
-        Date expirationDate = new Date(currentDate.getTime() + (long) JwtExpirationInMn * 60 * 1000);
+        long jwtExpirationInMillis = 30 * 60 * 1000;
+        Date expirationDate = new Date(currentDate.getTime() + jwtExpirationInMillis);
 
-        String token  = Jwts.builder()
-                .setSubject(email)
-                .claim("Authorities", authentication.getAuthorities())
-                .setIssuedAt(currentDate)
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
                 .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
-
-        return "Bearer "  + token;
     }
 
-    public Jws<Claims> validateToken (String token){
-        Jws<Claims> claimsJWS;
-        try {
-            claimsJWS = Jwts.parser()
-                    .setSigningKey(jwtSecret)
-                    .parseClaimsJws(token);
+    public String generatePasswordResetToken(String email){
+        Date currentDate = new Date();
+        Date expirationDate = new Date(currentDate.getTime() + 900000);
 
-        }catch (SignatureException ex){
-            throw  new InvalidJwtTokenException(HttpStatus.BAD_REQUEST, "invalid jwt token");
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(expirationDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
+    public String getUsernameFromJwt(String token){
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    public Boolean validateToken(String token){
+        try{
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            return true;
+        }catch (MalformedJwtException exception){
+            throw new RuntimeException("Invalid JWT_Token");
         }
-        var res = claimsJWS.getBody();
-        System.out.println(res);
-
-        return claimsJWS;
+    }
+    public Date extractExpiration(String token){
+        return extractClaim(token, Claims::getExpiration);
+    }
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+    }
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    public Date getExpiryDate (String token){
-        Jws<Claims>  claimsJws = validateToken(token);
-        Claims claims = claimsJws.getBody();
-        return claims.getExpiration();
-    }
+
 }

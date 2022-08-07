@@ -1,7 +1,5 @@
 package com.dtokens.digital_token.services.serviceImpl;
 
-import com.dtokens.digital_token.model.fxWallet;
-import com.dtokens.digital_token.services.fxWalletService;
 import org.springframework.stereotype.Service;
 
 @Service
