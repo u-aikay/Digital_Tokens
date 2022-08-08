@@ -8,11 +8,11 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="postgres" uuid="6ab9ba46-7af0-4aaa-ab96-b23cf8e995f9">
+    <data-source source="LOCAL" name="herokuPostgres" uuid="b6cde02e-8817-402e-8332-af8449f056bd">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://ec2-107-22-122-106.compute-1.amazonaws.com:5432/dupg9fu1qaqh4</jdbc-url>
+      <jdbc-url>jdbc:postgresql://ec2-54-225-234-165.compute-1.amazonaws.com:5432/d6ehlgclgfd3th</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
